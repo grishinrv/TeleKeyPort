@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using KeyPusher.WinApi;
 
 namespace KeyPusher
 {
@@ -14,11 +15,12 @@ namespace KeyPusher
         [STAThread]
         static void Main()
         {
+            var service = new KeyEventsDetector();
+            service.KeyEventHappened += (o, args) => MessageBox.Show($"{args.Key}");
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
-            Keys.
         }
     }
 }

@@ -18,7 +18,7 @@ namespace KeyPusher.WinApi
             _hookId = SetHook(_proc);
         }
 
-        public event Action<object, KeyEventArgs> KeyEventHappened;
+        public event Action<object, Models.KeyEventArgs> KeyEventHappened;
 
         private static IntPtr SetHook(LowLevelKeyboardProc proc)
         {
@@ -39,7 +39,7 @@ namespace KeyPusher.WinApi
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
                 int keyCode = Marshal.ReadInt32(lParam);
-                KeyEventHappened?.Invoke(this, new KeyEventArgs((Keys)keyCode));
+                KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode));
             }
             return CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
