@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using KeyPusher.WinApi;
@@ -27,15 +31,23 @@ namespace KeyPusher
         {
             _keysDetector = new KeyEventsDetector();
             _keysDetector.KeyEventHappened += (o, args) => MessageBox.Show($"{args.Key}");
+            // load icon from resources
+            var assembly = Assembly.GetExecutingAssembly();
+            var stream = assembly.GetManifestResourceStream("KeyPusher.Resources.gear.png");
+            var bitmap = new Bitmap(stream);
+            var pIcon = bitmap.GetHicon();
+            var icon = Icon.FromHandle(pIcon);
+            // set tray icon
             _trayIcon = new NotifyIcon()
             {
-                //Icon = ToolTipIcon.Info,
+                Icon = icon,
                 //Me
                 //ContextMenu = new ContextMenu(new MenuItem[] {
                 //    new MenuItem("Exit", Exit)
                 //}),
                 Visible = true
             };
+            icon.Dispose();
         }
 
         private void Exit(object sender, EventArgs e)

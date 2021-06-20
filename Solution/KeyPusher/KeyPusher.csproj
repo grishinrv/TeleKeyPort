@@ -7,4 +7,14 @@
     <LangVersion>default</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Resources\gear.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\gear.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
