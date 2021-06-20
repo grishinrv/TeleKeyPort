@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -37,20 +38,27 @@ namespace KeyPusher
             var bitmap = new Bitmap(stream);
             var pIcon = bitmap.GetHicon();
             var icon = Icon.FromHandle(pIcon);
+
             // set tray icon
-            _trayIcon = new NotifyIcon()
+            var trayContextMenu = new ContextMenuStrip();
+            trayContextMenu.Items.Add("Exit");
+            trayContextMenu.ItemClicked += OnTrayItemClicked;
+            _trayIcon = new NotifyIcon
             {
                 Icon = icon,
-                //Me
-                //ContextMenu = new ContextMenu(new MenuItem[] {
-                //    new MenuItem("Exit", Exit)
-                //}),
+                ContextMenuStrip = trayContextMenu,
                 Visible = true
             };
             icon.Dispose();
         }
 
-        private void Exit(object sender, EventArgs e)
+        private void OnTrayItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            if (e.ClickedItem.Text == "Exit")
+                Exit();
+        }
+
+        private void Exit()
         {
             // Hide tray icon, otherwise it will remain shown until user mouses over it
             _trayIcon.Visible = false;
