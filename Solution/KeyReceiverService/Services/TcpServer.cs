@@ -22,13 +22,6 @@ namespace KeyReceiverService.Services
         {
             var tcpListener = TcpListener.Create(8080); // todo get from config
             tcpListener.Start();
-            var cancelTask = Task.Run(async () =>
-            {
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    await Task.Delay(5000);
-                }
-            });
 
             while (!_disposed)
             {
