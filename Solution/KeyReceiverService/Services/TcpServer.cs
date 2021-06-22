@@ -1,5 +1,6 @@
 ﻿using NLog;
 using System;
+using System.Configuration;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,17 +11,21 @@ namespace KeyReceiverService.Services
     {
         private bool _disposed;
         private readonly ILogger _logger;
+        private readonly int _port;
 
         private readonly KeyEventProcessor _keyEventMessageProcessor;
         public TcpServer()
         {
             _keyEventMessageProcessor = new KeyEventProcessor(new KeyBoardProxy());
             _logger = LogManager.GetCurrentClassLogger();
+            var port = ConfigurationManager.AppSettings["Port"];
+            if (!int.TryParse(port, out _port))
+                _port = 8080;
         }
 
         public async Task RunServer(CancellationToken stoppingToken)
         {
-            var tcpListener = TcpListener.Create(8080); // todo get from config
+            var tcpListener = TcpListener.Create(_port);
             tcpListener.Start();
 
             while (!_disposed && stoppingToken.IsCancellationRequested)
