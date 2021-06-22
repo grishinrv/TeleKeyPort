@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyPusher", "KeyPusher\KeyP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyReceiverService", "KeyReceiverService\KeyReceiverService.csproj", "{FCA5E908-78A2-4E70-BF95-8EFF6A9F90B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{ED984566-4BD6-4AEB-B6CC-9430862EF8E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FCA5E908-78A2-4E70-BF95-8EFF6A9F90B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCA5E908-78A2-4E70-BF95-8EFF6A9F90B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCA5E908-78A2-4E70-BF95-8EFF6A9F90B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED984566-4BD6-4AEB-B6CC-9430862EF8E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED984566-4BD6-4AEB-B6CC-9430862EF8E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED984566-4BD6-4AEB-B6CC-9430862EF8E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED984566-4BD6-4AEB-B6CC-9430862EF8E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
