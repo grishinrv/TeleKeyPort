@@ -23,7 +23,7 @@ namespace KeyReceiverService.Services
             var tcpListener = TcpListener.Create(8080); // todo get from config
             tcpListener.Start();
 
-            while (!_disposed)
+            while (!_disposed && stoppingToken.IsCancellationRequested)
             {
                     var tcpClient = await ExecuteAsync(tcpListener.AcceptTcpClientAsync(), 5000);
                     if (tcpClient != null)
@@ -51,9 +51,11 @@ namespace KeyReceiverService.Services
         {
             try
             {
-                await using var stream = tcp.GetStream();
-                await _keyEventMessageProcessor.ProcessAsync(stream);
-                tcp.Dispose();
+                using (tcp)
+                {
+                    await using var stream = tcp.GetStream();
+                    await _keyEventMessageProcessor.ProcessAsync(stream);
+                }
             }
             catch (Exception e)
             {
