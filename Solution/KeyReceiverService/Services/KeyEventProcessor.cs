@@ -12,7 +12,7 @@ namespace KeyReceiverService.Services
 
         protected sealed override void Process(KeyEventMessage message)
         {
-
+            //todo
         }
     }
 }

@@ -4,21 +4,23 @@ using System.Configuration;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using KeyReceiverService.Configuration;
 
 namespace KeyReceiverService.Services
 {
     public class TcpServer : IDisposable
     {
         private bool _disposed;
-        private readonly ILogger _logger;
         private readonly int _port;
 
+        private readonly ILogger _logger;
         private readonly KeyEventProcessor _keyEventMessageProcessor;
-        public TcpServer(int port)
+
+        public TcpServer(KeyEventProcessor keyEventProcessor, WorkerOptions options)
         {
-            _keyEventMessageProcessor = new KeyEventProcessor(new KeyBoardProxy());
+            _keyEventMessageProcessor = keyEventProcessor;
             _logger = LogManager.GetCurrentClassLogger();
-            _port = port;
+            _port = options.Port;
         }
 
         public async Task RunServer(CancellationToken stoppingToken)

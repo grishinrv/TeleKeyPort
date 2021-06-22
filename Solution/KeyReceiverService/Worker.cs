@@ -12,10 +12,10 @@ namespace KeyReceiverService
         private readonly ILogger _logger;
         private readonly TcpServer _server;
 
-        public Worker(WorkerOptions options)
+        public Worker(TcpServer server)
         {
             _logger = LogManager.GetCurrentClassLogger();
-            _server = new TcpServer(options.Port);
+            _server = server;
         }
 
         protected sealed override async Task ExecuteAsync(CancellationToken stoppingToken)
