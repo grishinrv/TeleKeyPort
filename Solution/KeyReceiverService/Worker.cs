@@ -1,7 +1,6 @@
 using KeyReceiverService.Services;
 using Microsoft.Extensions.Hosting;
 using NLog;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,10 +17,12 @@ namespace KeyReceiverService
             _server = new TcpServer();
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected sealed override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await _server.RunServer(stoppingToken);
-            _server.Dispose();
+            _logger.Info("Serive started");
+            using (_server)
+                await _server.RunServer(stoppingToken);
+            _logger.Info("Serive stopped");
         }
     }
 }
