@@ -14,13 +14,11 @@ namespace KeyReceiverService.Services
         private readonly int _port;
 
         private readonly KeyEventProcessor _keyEventMessageProcessor;
-        public TcpServer()
+        public TcpServer(int port)
         {
             _keyEventMessageProcessor = new KeyEventProcessor(new KeyBoardProxy());
             _logger = LogManager.GetCurrentClassLogger();
-            var port = ConfigurationManager.AppSettings["Port"];
-            if (!int.TryParse(port, out _port))
-                _port = 8080;
+            _port = port;
         }
 
         public async Task RunServer(CancellationToken stoppingToken)

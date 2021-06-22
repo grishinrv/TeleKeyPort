@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using NLog;
 using System.Threading;
 using System.Threading.Tasks;
+using KeyReceiverService.Configuration;
 
 namespace KeyReceiverService
 {
@@ -11,10 +12,10 @@ namespace KeyReceiverService
         private readonly ILogger _logger;
         private readonly TcpServer _server;
 
-        public Worker()
+        public Worker(WorkerOptions options)
         {
             _logger = LogManager.GetCurrentClassLogger();
-            _server = new TcpServer();
+            _server = new TcpServer(options.Port);
         }
 
         protected sealed override async Task ExecuteAsync(CancellationToken stoppingToken)
