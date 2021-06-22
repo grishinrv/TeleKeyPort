@@ -25,25 +25,25 @@ namespace KeyReceiverService.Services
 
             while (!_disposed)
             {
-                try
-                {
                     var tcpClient = await ExecuteAsync(tcpListener.AcceptTcpClientAsync(), 5000);
                     if (tcpClient != null)
 #pragma warning disable 4014
                         ProcessMessage(tcpClient);
 #pragma warning restore 4014
-                }
-                catch (SocketException e)
-                {
-                    _logger.Error(e);
-                }
             }
         }
 
         private async Task<T> ExecuteAsync<T>(Task<T> task, int millisecondsTimeout)
         {
-            if (await Task.WhenAny(task, Task.Delay(millisecondsTimeout)) == task)
-                return task.Result;
+            try
+            {
+                if (await Task.WhenAny(task, Task.Delay(millisecondsTimeout)) == task)
+                    return task.Result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+            }
             return default(T);
         }
 
