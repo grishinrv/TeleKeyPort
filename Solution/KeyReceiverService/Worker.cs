@@ -1,33 +1,27 @@
+using KeyReceiverService.Services;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using NLog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using KeyReceiverService.Services;
 
 namespace KeyReceiverService
 {
     public class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
-        private readonly KeyBoardProxy _keyBoard;
+        private readonly ILogger _logger;
+        private readonly TcpServer _server;
 
-        public Worker(ILogger<Worker> logger)
+        public Worker()
         {
-            _logger = logger;
-            _keyBoard = new KeyBoardProxy();
+            _logger = LogManager.GetCurrentClassLogger();
+            _server = new TcpServer();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                _keyBoard.PressKey();
-                await Task.Delay(1000, stoppingToken);
-            }
+            await _server.RunServer(stoppingToken);
+            _server.Dispose();
         }
     }
 }

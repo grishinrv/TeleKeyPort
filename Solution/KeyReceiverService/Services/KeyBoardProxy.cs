@@ -16,6 +16,7 @@ namespace KeyReceiverService.Services
             const int VK_RIGHT = 0x27;
             const uint KEYEVENTF_KEYUP = 0x0002;
             const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
+            const int WM_KEYDOWN = 0x0100;
 
             Task.Run(async () =>
             {
@@ -29,7 +30,7 @@ namespace KeyReceiverService.Services
                 int press()
                 {
                     //Press the key
-                    keybd_event((byte) 0x45, 0, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                    keybd_event((byte) 0x45, 0, WM_KEYDOWN | 0, 0);
                     return 0;
                 }
 
