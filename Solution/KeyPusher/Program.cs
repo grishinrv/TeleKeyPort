@@ -34,7 +34,7 @@ namespace KeyPusher
 
         public KeyPusherApp(ConnectionOptions connectionOptions, HotKeysOptions hotKeysOptions)
         {
-            _keysDetector = new KeyEventsDetector();
+            _keysDetector = new KeyEventsDetector(hotKeysOptions);
             _keysDetector.KeyEventHappened += (o, args) => MessageBox.Show($"{args.Key}");
             // load icon from resources
             var assembly = Assembly.GetExecutingAssembly();

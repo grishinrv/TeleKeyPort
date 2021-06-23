@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using KeyPusher.Configuration;
 
 namespace KeyPusher.WinApi
 {
@@ -11,9 +12,11 @@ namespace KeyPusher.WinApi
         private const int WM_KEYDOWN = 0x0100;
         private LowLevelKeyboardProc _proc;
         private IntPtr _hookId = IntPtr.Zero;
+        private readonly HotKeysOptions _hotKeysOptions;
 
-        public KeyEventsDetector()
+        public KeyEventsDetector(HotKeysOptions hotKeysOptions)
         {
+            _hotKeysOptions = hotKeysOptions;
             _proc = HookCallback;
             _hookId = SetHook(_proc);
         }
