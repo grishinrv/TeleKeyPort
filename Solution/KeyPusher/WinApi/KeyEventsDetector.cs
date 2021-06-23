@@ -25,12 +25,9 @@ namespace KeyPusher.WinApi
 
         private static IntPtr SetHook(LowLevelKeyboardProc proc)
         {
-            using (var curProcess = Process.GetCurrentProcess())
-            using (var curModule = curProcess.MainModule)
-            {
-                return SetWindowsHookEx(WH_KEYBOARD_LL, proc,
-                    GetModuleHandle(curModule.ModuleName), 0);
-            }
+            using var curProcess = Process.GetCurrentProcess();
+            using var curModule = curProcess.MainModule;
+            return SetWindowsHookEx(WH_KEYBOARD_LL, proc,GetModuleHandle(curModule.ModuleName), 0);
         }
 
         private delegate IntPtr LowLevelKeyboardProc(

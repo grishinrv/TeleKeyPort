@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Shared.Configuration;
 using System;
 using System.Windows.Forms;
+using KeyPusher.Menus;
 
 namespace KeyPusher
 {
@@ -32,7 +33,13 @@ namespace KeyPusher
                         .AddSingleton(configuration.GetSection("HotKeys").Get<HotKeysOptions>())
                         .AddSingleton<KeyPusherApp>()
                         .AddSingleton<KeyEventsDetector>()
-                        .AddTransient<TcpChannel>();
+                        .AddSingleton<MenuController>()
+                        .AddSingleton<ContextMenuStrip>()
+                        .AddSingleton<KeyPusherEngine>()
+                        .AddTransient<TcpChannel>()
+                        .AddTransient<IMenuItemPresenter, ExitMenuItem>()
+                        .AddTransient<IMenuItemPresenter, EnableHookMenuItem>()
+                        .AddTransient<IMenuItemPresenter, DisableHookMenuItem>();
                 })
                 .ConfigureLogging((hostBuilderContext, logging) =>
                 {
