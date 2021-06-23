@@ -3,6 +3,8 @@ using KeyReceiverService.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 
 namespace KeyReceiverService
 {
@@ -25,6 +27,12 @@ namespace KeyReceiverService
                     services.AddSingleton<TcpServer>();
                     services.AddTransient<KeyEventProcessor>();
                     services.AddHostedService<Worker>();
+                    services.AddLogging(loggingBuilder =>
+                    {
+                        loggingBuilder.ClearProviders();
+                        loggingBuilder.AddConfiguration(configuration.GetSection("Logging"));
+                        loggingBuilder.AddNLog(configuration);
+                    });
                 });
     }
 }

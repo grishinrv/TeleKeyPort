@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using KeyReceiverService.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace KeyReceiverService.Services
 {
@@ -13,13 +14,13 @@ namespace KeyReceiverService.Services
         private bool _disposed;
         private readonly int _port;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<TcpServer> _logger;
         private readonly KeyEventProcessor _keyEventMessageProcessor;
 
-        public TcpServer(KeyEventProcessor keyEventProcessor, WorkerOptions options)
+        public TcpServer(KeyEventProcessor keyEventProcessor, WorkerOptions options, ILogger<TcpServer> logger)
         {
             _keyEventMessageProcessor = keyEventProcessor;
-            _logger = LogManager.GetCurrentClassLogger();
+            _logger = logger;
             _port = options.Port;
         }
 
@@ -28,7 +29,7 @@ namespace KeyReceiverService.Services
             var tcpListener = TcpListener.Create(_port);
             tcpListener.Start();
 
-            while (!_disposed && stoppingToken.IsCancellationRequested)
+            while (!_disposed && !stoppingToken.IsCancellationRequested)
             {
                     var tcpClient = await ExecuteAsync(tcpListener.AcceptTcpClientAsync(), 5000);
                     if (tcpClient != null)
@@ -47,7 +48,7 @@ namespace KeyReceiverService.Services
             }
             catch (Exception e)
             {
-                _logger.Error(e);
+                _logger.LogError(e, "Error when trying to receive tcp socket connection");
             }
             return default(T);
         }
@@ -64,7 +65,7 @@ namespace KeyReceiverService.Services
             }
             catch (Exception e)
             {
-                _logger.Error(e);
+                _logger.LogError(e, "Error when trying to process data from socket");
             }
         }
 
