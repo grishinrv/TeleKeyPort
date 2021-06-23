@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using KeyPusher.WinApi;
+using System;
+using System.Drawing;
+using System.Reflection;
+using System.Windows.Forms;
+using KeyPusher.Configuration;
+using Microsoft.Extensions.Configuration;
+using Shared.Infrastructure;
 
 namespace KeyPusher
 {
@@ -19,7 +16,14 @@ namespace KeyPusher
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new KeyPusherApp());
+
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Utils.GetApplicationRootPath())
+                .AddJsonFile("appsettings.json", true, false);
+            var config = builder.Build();
+            var connectionOptions = config.GetSection("WebConfig").Get<ConnectionOptions>();
+            var hotKeysOptions = config.GetSection("HotKeys").Get<HotKeysOptions>();
+            Application.Run(new KeyPusherApp(connectionOptions, hotKeysOptions));
         }
     }
 
@@ -28,7 +32,7 @@ namespace KeyPusher
         private NotifyIcon _trayIcon;
         private KeyEventsDetector _keysDetector;
 
-        public KeyPusherApp()
+        public KeyPusherApp(ConnectionOptions connectionOptions, HotKeysOptions hotKeysOptions)
         {
             _keysDetector = new KeyEventsDetector();
             _keysDetector.KeyEventHappened += (o, args) => MessageBox.Show($"{args.Key}");
