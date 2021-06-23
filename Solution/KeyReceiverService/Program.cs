@@ -1,4 +1,5 @@
 using KeyReceiverService.Configuration;
+using KeyReceiverService.Infrastructure;
 using KeyReceiverService.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,11 +28,12 @@ namespace KeyReceiverService
                     services.AddSingleton<TcpServer>();
                     services.AddTransient<KeyEventProcessor>();
                     services.AddHostedService<Worker>();
-                    services.AddLogging(loggingBuilder =>
+                })
+                .ConfigureLogging((hostBuilderContext, logging) =>
+                {
+                    logging.AddFileLogger(options =>
                     {
-                        loggingBuilder.ClearProviders();
-                        loggingBuilder.AddConfiguration(configuration.GetSection("Logging"));
-                        loggingBuilder.AddNLog(configuration);
+                        hostBuilderContext.Configuration.GetSection("Logging").GetSection("FileLogger").GetSection("Options").Bind(options);
                     });
                 });
     }
