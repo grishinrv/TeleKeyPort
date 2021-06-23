@@ -1,11 +1,12 @@
-using KeyPusher.WinApi;
-using System;
-using System.Drawing;
-using System.Reflection;
-using System.Windows.Forms;
 using KeyPusher.Configuration;
+using KeyPusher.Services;
+using KeyPusher.WinApi;
 using Microsoft.Extensions.Configuration;
-using Shared.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Shared.Configuration;
+using System;
+using System.Windows.Forms;
 
 namespace KeyPusher
 {
@@ -16,58 +17,29 @@ namespace KeyPusher
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Utils.GetApplicationRootPath())
-                .AddJsonFile("appsettings.json", true, false);
-            var config = builder.Build();
-            var connectionOptions = config.GetSection("WebConfig").Get<ConnectionOptions>();
-            var hotKeysOptions = config.GetSection("HotKeys").Get<HotKeysOptions>();
-            Application.Run(new KeyPusherApp(connectionOptions, hotKeysOptions));
-        }
-    }
-
-    public class KeyPusherApp : ApplicationContext
-    {
-        private NotifyIcon _trayIcon;
-        private KeyEventsDetector _keysDetector;
-
-        public KeyPusherApp(ConnectionOptions connectionOptions, HotKeysOptions hotKeysOptions)
-        {
-            _keysDetector = new KeyEventsDetector(hotKeysOptions);
-            _keysDetector.KeyEventHappened += (o, args) => MessageBox.Show($"{args.Key}");
-            // load icon from resources
-            var assembly = Assembly.GetExecutingAssembly();
-            var stream = assembly.GetManifestResourceStream("KeyPusher.Resources.gear.png");
-            var bitmap = new Bitmap(stream);
-            var pIcon = bitmap.GetHicon();
-            var icon = Icon.FromHandle(pIcon);
-
-            // set tray icon
-            var trayContextMenu = new ContextMenuStrip();
-            trayContextMenu.Items.Add("Exit");
-            trayContextMenu.ItemClicked += OnTrayItemClicked;
-            _trayIcon = new NotifyIcon
-            {
-                Icon = icon,
-                ContextMenuStrip = trayContextMenu,
-                Visible = true
-            };
-            icon.Dispose();
+            var host = CreateHostBuilder().Build();
+            var services = host.Services;
+            var application = services.GetRequiredService<KeyPusherApp>();
+            Application.Run(application);
         }
 
-        private void OnTrayItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            if (e.ClickedItem.Text == "Exit")
-                Exit();
-        }
-
-        private void Exit()
-        {
-            // Hide tray icon, otherwise it will remain shown until user mouses over it
-            _trayIcon.Visible = false;
-            _keysDetector.Dispose();
-            Application.Exit();
-        }
+        public static IHostBuilder CreateHostBuilder() =>
+            Host.CreateDefaultBuilder()
+                .ConfigureServices((hostContext, services) =>
+                {
+                    var configuration = hostContext.Configuration;
+                    services.AddSingleton(configuration.GetSection("WebConfig").Get<ConnectionOptions>())
+                        .AddSingleton(configuration.GetSection("HotKeys").Get<HotKeysOptions>())
+                        .AddSingleton<KeyPusherApp>()
+                        .AddSingleton<KeyEventsDetector>()
+                        .AddTransient<TcpChannel>();
+                })
+                .ConfigureLogging((hostBuilderContext, logging) =>
+                {
+                    logging.AddFileLogger(options =>
+                    {
+                        hostBuilderContext.Configuration.GetSection("Logging").GetSection("FileLogger").GetSection("Options").Bind(options);
+                    });
+                });
     }
 }
