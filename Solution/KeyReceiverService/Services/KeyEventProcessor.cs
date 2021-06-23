@@ -15,7 +15,8 @@ namespace KeyReceiverService.Services
 
         protected sealed override void Process(KeyEventMessage message)
         {
-            //todo
+            _logger.LogInformation("Processing KeyEventMessage: Key {0}, Event {1}", message.KeyCode, message.EventCode);
+            _proxy.Execute(message.KeyCode, message.EventCode);
         }
     }
 }
