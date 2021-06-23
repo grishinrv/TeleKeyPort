@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
-namespace KeyReceiverService.Infrastructure
+namespace Shared.Infrastructure
 {
     public class FileLogger : ILogger
     {

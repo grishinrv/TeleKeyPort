@@ -1,6 +1,6 @@
 ﻿using MessagePack;
 
-namespace Shared
+namespace Shared.Models
 {
     [MessagePackObject]
     public class KeyEventMessage

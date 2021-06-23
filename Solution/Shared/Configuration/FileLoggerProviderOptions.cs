@@ -1,4 +1,4 @@
-﻿namespace KeyReceiverService.Configuration
+﻿namespace Shared.Configuration
 {
     public class FileLoggerProviderOptions
     {

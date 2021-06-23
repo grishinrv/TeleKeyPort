@@ -1,9 +1,9 @@
-﻿using KeyReceiverService.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shared.Infrastructure;
 using System;
 
-namespace KeyReceiverService.Infrastructure
+namespace Shared.Configuration
 {
     public static class FileLoggerExtensions
     {

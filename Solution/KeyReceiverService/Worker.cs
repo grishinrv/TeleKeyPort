@@ -1,10 +1,8 @@
 using KeyReceiverService.Services;
 using Microsoft.Extensions.Hosting;
-using NLog;
+using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
-using KeyReceiverService.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace KeyReceiverService
 {

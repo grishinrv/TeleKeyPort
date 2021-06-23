@@ -1,10 +1,9 @@
-﻿using KeyReceiverService.Configuration;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Shared.Configuration;
 using System.IO;
-using System.Reflection;
 
-namespace KeyReceiverService.Infrastructure
+namespace Shared.Infrastructure
 {
     [ProviderAlias("FileLogger")]
     public class FileLoggerProvider : ILoggerProvider

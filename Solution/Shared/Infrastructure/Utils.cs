@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 
-namespace KeyReceiverService.Infrastructure
+namespace Shared.Infrastructure
 {
     public class Utils
     {
