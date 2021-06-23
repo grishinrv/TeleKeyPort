@@ -22,8 +22,8 @@ namespace KeyReceiverService.Infrastructure
         {
             if (!IsEnabled(logLevel))
                 return;
-
-            var fullFilePath = _provider.Options.FolderPath + "/" + _provider.Options.FilePath.Replace("{date}", DateTimeOffset.UtcNow.ToString("yyyyMMdd"));
+            var logsFolderPath = Utils.GetApplicationRootPath() + _provider.Options.FolderPath + "\\";
+            var fullFilePath = logsFolderPath + _provider.Options.FilePath.Replace("{date}", DateTimeOffset.UtcNow.ToString("yyyyMMdd"));
             var logRecord =
                 $"{"[" + DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss+00:00") + "]"} [{logLevel.ToString()}] {formatter(state, exception)} {(exception != null ? exception.StackTrace : "")}";
 

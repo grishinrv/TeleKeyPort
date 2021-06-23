@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO;
+using System.Reflection;
 
 namespace KeyReceiverService.Infrastructure
 {
@@ -13,10 +14,9 @@ namespace KeyReceiverService.Infrastructure
         public FileLoggerProvider(IOptions<FileLoggerProviderOptions> _options)
         {
             Options = _options.Value;
-            var current = Directory.GetCurrentDirectory();
-
-            if (!Directory.Exists(current + Options.FolderPath))
-                Directory.CreateDirectory(current + Options.FolderPath);
+            var logsFolderPath = Utils.GetApplicationRootPath() + Options.FolderPath;
+            if (!Directory.Exists(logsFolderPath))
+                Directory.CreateDirectory(logsFolderPath);
         }
 
         public ILogger CreateLogger(string categoryName) => new FileLogger(this);
