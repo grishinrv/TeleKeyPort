@@ -1,5 +1,5 @@
 ﻿using KeyPusher.Configuration;
-using KeyPusher.Models;
+using KeyPusher.Services;
 using Microsoft.Extensions.Logging;
 using System.Windows.Forms;
 
@@ -7,17 +7,14 @@ namespace KeyPusher.Menus
 {
     public class DisableHookMenuItem : MenuItemPresenterBase<DisableHookMenuItem>
     {
-        public DisableHookMenuItem(ContextMenuStrip mainMenu, HotKeysOptions hotkeys, ILogger<DisableHookMenuItem> logger) : base(mainMenu, hotkeys, logger)
+        public DisableHookMenuItem(KeyPusherEngine engine, ContextMenuStrip mainMenu, HotKeysOptions hotkeys, ILogger<DisableHookMenuItem> logger) : base(engine, mainMenu, hotkeys, logger)
         {
+            HotKeyCode = hotkeys.TurnHookOff;
         }
 
-        protected sealed override string ActionName { get; }
-        internal sealed override byte? HotKeyCode { get; }
-        protected sealed override void ExecuteInternal()
-        {
-            //todo
-        }
-
-        protected override bool EnablementFunction(MenuController menuController) => menuController.AppMode == Mode.Active;
+        public sealed override string ActionName => "Disable hooks";
+        public sealed override byte? HotKeyCode { get; }
+        protected sealed override void ExecuteInternal() => _engine.Enabled = false;
+        protected override bool EnablementFunction() => _engine.Enabled = true;
     }
 }

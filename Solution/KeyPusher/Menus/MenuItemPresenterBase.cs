@@ -2,22 +2,53 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Windows.Forms;
+using KeyPusher.Services;
 
 namespace KeyPusher.Menus
 {
-    public abstract class MenuItemPresenterBase<T> : IMenuItemPresenter where T : MenuItemPresenterBase<T>
+    public abstract class MenuItemPresenterBase : IMenuItemPresenter
     {
-        protected readonly ILogger<T> _logger;
-        protected abstract string ActionName { get; }
-        private readonly ToolStripItem _menuItem;
-        internal abstract byte? HotKeyCode { get; }
-        protected MenuItemPresenterBase(ContextMenuStrip mainMenu, HotKeysOptions hotkeys, ILogger<T> logger)
+        protected readonly KeyPusherEngine _engine;
+        public abstract string ActionName { get; }
+        private ToolStripItem MenuItem { get; set; }
+        private readonly ContextMenuStrip _mainMenu;
+        public abstract byte? HotKeyCode { get; }
+        protected MenuItemPresenterBase(KeyPusherEngine engine, ContextMenuStrip mainMenu, HotKeysOptions hotkeys)
         {
-            _logger = logger;
-            _menuItem = mainMenu.Items.Add(ActionName);
+            _engine = engine;
+            _mainMenu = mainMenu;
         }
 
-        public void ExecuteAction()
+        public abstract void ExecuteAction();
+
+        public void StateChanged()
+        {
+            if (_mainMenu.InvokeRequired)
+                _mainMenu.Invoke(new Action(() => { MenuItem.Enabled = EnablementFunction(); }));
+            else
+                MenuItem.Enabled = EnablementFunction();
+        }
+
+        public void CreateView()
+        {
+            MenuItem = _mainMenu.Items.Add(ActionName);
+            StateChanged();
+        }
+
+        protected abstract void ExecuteInternal();
+
+        protected virtual bool EnablementFunction() => true;
+    }
+
+    public abstract class MenuItemPresenterBase<T> : MenuItemPresenterBase where T : MenuItemPresenterBase<T>
+    {
+        protected readonly ILogger<T> _logger;
+        protected MenuItemPresenterBase(KeyPusherEngine engine, ContextMenuStrip mainMenu, HotKeysOptions hotkeys, ILogger<T> logger) : base(engine, mainMenu, hotkeys)
+        {
+            _logger = logger;
+        }
+
+        public sealed override void ExecuteAction()
         {
             try
             {
@@ -28,11 +59,5 @@ namespace KeyPusher.Menus
                 _logger.LogError(e, "Error attempting to execute menu action {0}", ActionName);
             }
         }
-
-        public void StateChanged(MenuController menuController) => _menuItem.Enabled = EnablementFunction(meniController);
-
-        protected abstract void ExecuteInternal();
-
-        protected virtual bool EnablementFunction(MenuController menuController) => true;
     }
 }

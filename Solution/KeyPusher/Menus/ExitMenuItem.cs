@@ -1,17 +1,18 @@
 ﻿using KeyPusher.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Windows.Forms;
+using KeyPusher.Services;
 
 namespace KeyPusher.Menus
 {
     public class ExitMenuItem : MenuItemPresenterBase<ExitMenuItem>
     {
-        public ExitMenuItem(ContextMenuStrip mainMenu, HotKeysOptions hotkeys, ILogger<ExitMenuItem> logger) : base(mainMenu, hotkeys, logger)
+        public ExitMenuItem(KeyPusherEngine engine, ContextMenuStrip mainMenu, HotKeysOptions hotkeys, ILogger<ExitMenuItem> logger) : base(engine, mainMenu, hotkeys, logger)
         {
         }
 
-        protected sealed override string ActionName => "Exit";
-        internal sealed override byte? HotKeyCode => null;
-        protected sealed override void ExecuteInternal() => _state.Dispose();
+        public sealed override string ActionName => "Exit";
+        public sealed override byte? HotKeyCode => null;
+        protected sealed override void ExecuteInternal() => _engine.Dispose();
     }
 }

@@ -1,30 +1,19 @@
-using System.Drawing;
-using System.Reflection;
-using System.Windows.Forms;
-using KeyPusher.Configuration;
+using KeyPusher.Menus;
 using KeyPusher.Services;
-using KeyPusher.WinApi;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace KeyPusher
 {
     public class KeyPusherApp : ApplicationContext
     {
-        private readonly KeyEventsDetector _keysDetector;
-        private readonly TcpChannel _tcp;
+        private readonly KeyPusherEngine _engine;
 
-        public KeyPusherApp(TcpChannel tcp, KeyEventsDetector keysDetector)
+        public KeyPusherApp(KeyPusherEngine engine, MenuPresenter menu, IEnumerable<IMenuItemPresenter> menuItems)
         {
-            _tcp = tcp;
-            _keysDetector = keysDetector;
-            _keysDetector.KeyEventHappened += (o, args) => MessageBox.Show($"{args.Key}");
-        }
-
-        
-
-        private void Exit()
-        {
-            _keysDetector.Dispose();
-            _tcp.Dispose();
+            _engine = engine;
+            menu.SetMenuItems(menuItems.ToList());
         }
     }
 }

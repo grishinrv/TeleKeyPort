@@ -1,27 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
-using KeyPusher.Configuration;
-using KeyPusher.Models;
+﻿using KeyPusher.Configuration;
 using KeyPusher.Services;
 using Microsoft.Extensions.Logging;
+using System.Windows.Forms;
 
 namespace KeyPusher.Menus
 {
     public class EnableHookMenuItem : MenuItemPresenterBase<EnableHookMenuItem>
     {
-        public EnableHookMenuItem(ContextMenuStrip mainMenu, HotKeysOptions hotkeys, ILogger<EnableHookMenuItem> logger) : base(mainMenu, hotkeys, logger)
+        public EnableHookMenuItem(KeyPusherEngine engine, ContextMenuStrip mainMenu, HotKeysOptions hotkeys, ILogger<EnableHookMenuItem> logger) : base(engine, mainMenu, hotkeys, logger)
         {
+            HotKeyCode = hotkeys.TurnHookOn;
         }
 
-        protected sealed override string ActionName => "Enable hooks";
-        internal sealed override byte? HotKeyCode => null;
-        protected sealed override void ExecuteInternal()
-        {
-            //todo
-        }
-
-        protected sealed override bool EnablementFunction(MenuController menuController) => menuController.AppMode == Mode.Ignore;
+        public sealed override string ActionName => "Enable hooks";
+        public sealed override byte? HotKeyCode { get; }
+        protected sealed override void ExecuteInternal() => _engine.Enabled = true;
+        protected sealed override bool EnablementFunction() => _engine.Enabled = false;
     }
 }

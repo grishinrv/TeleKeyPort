@@ -33,7 +33,7 @@ namespace KeyPusher
                         .AddSingleton(configuration.GetSection("HotKeys").Get<HotKeysOptions>())
                         .AddSingleton<KeyPusherApp>()
                         .AddSingleton<KeyEventsDetector>()
-                        .AddSingleton<MenuController>()
+                        .AddSingleton<MenuPresenter>()
                         .AddSingleton<ContextMenuStrip>()
                         .AddSingleton<KeyPusherEngine>()
                         .AddTransient<TcpChannel>()

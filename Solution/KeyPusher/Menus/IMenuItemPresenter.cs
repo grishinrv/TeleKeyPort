@@ -1,10 +1,11 @@
-﻿using KeyPusher.Services;
-
-namespace KeyPusher.Menus
+﻿namespace KeyPusher.Menus
 {
     public interface IMenuItemPresenter
     {
         void ExecuteAction();
-        void StateChanged(MenuController meniController)
+        void StateChanged();
+        void CreateView();
+        string ActionName { get; }
+        byte? HotKeyCode { get; }
     }
 }
