@@ -21,7 +21,7 @@ namespace KeyPusher
             var host = CreateHostBuilder().Build();
             var services = host.Services;
             var application = services.GetRequiredService<KeyPusherApp>();
-            Application.Run(application);
+            application.Run();
         }
 
         public static IHostBuilder CreateHostBuilder() =>
