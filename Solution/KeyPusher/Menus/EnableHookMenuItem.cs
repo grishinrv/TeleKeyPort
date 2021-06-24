@@ -15,6 +15,6 @@ namespace KeyPusher.Menus
         public sealed override string ActionName => "Enable hooks";
         public sealed override byte? HotKeyCode { get; }
         protected sealed override void ExecuteInternal() => _engine.Enabled = true;
-        protected sealed override bool EnablementFunction() => _engine.Enabled = false;
+        protected sealed override bool EnablementFunction() => !_engine.Enabled;
     }
 }
