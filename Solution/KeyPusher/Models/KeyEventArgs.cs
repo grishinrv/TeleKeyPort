@@ -8,11 +8,13 @@ namespace KeyPusher.Models
     /// </summary>
     public class KeyEventArgs : EventArgs
     {
-        public KeyEventArgs(Keys key)
+        public KeyEventArgs(Keys key, int eventCode)
         {
             Key = key;
+            EventCode = eventCode;
         }
 
         public Keys Key { get; }
+        public int EventCode { get; }
     }
 }

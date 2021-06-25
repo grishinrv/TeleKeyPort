@@ -8,8 +8,9 @@ namespace KeyPusher.WinApi
 {
     public class KeyEventsDetector : IDisposable
     {
-        private const int WH_KEYBOARD_LL = 13;
+        private const int WH_KEYBOARD_LL = 13; // enable hooking
         private const int WM_KEYDOWN = 0x0100;
+        private const int WM_KEYUP = 0x0101;
         private LowLevelKeyboardProc _proc;
         private IntPtr _hookId = IntPtr.Zero;
         private readonly HotKeysOptions _hotKeysOptions;
@@ -18,7 +19,23 @@ namespace KeyPusher.WinApi
         {
             _hotKeysOptions = hotKeysOptions;
             _proc = HookCallback;
-            _hookId = SetHook(_proc);
+        }
+
+        private bool _enableHooking;
+        public bool EnableHooking
+        {
+            get => _enableHooking;
+            set
+            {
+                if (_enableHooking != value)
+                {
+                    _enableHooking = value;
+                    if(_enableHooking)
+                        _hookId = SetHook(_proc);
+                    else
+                        UnhookWindowsHookEx(_hookId);
+                }
+            }
         }
 
         public event Action<object, Models.KeyEventArgs> KeyEventHappened;
@@ -33,13 +50,12 @@ namespace KeyPusher.WinApi
         private delegate IntPtr LowLevelKeyboardProc(
             int nCode, IntPtr wParam, IntPtr lParam);
 
-        private IntPtr HookCallback(
-            int nCode, IntPtr wParam, IntPtr lParam)
+        private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
-                int keyCode = Marshal.ReadInt32(lParam);
-                KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode));
+                var keyCode = Marshal.ReadInt32(lParam);
+                KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, WM_KEYDOWN));
             }
             return CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
