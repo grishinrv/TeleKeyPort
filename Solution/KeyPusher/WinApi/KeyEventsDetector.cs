@@ -54,6 +54,9 @@ namespace KeyPusher.WinApi
         {
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
+#if DEBUG
+                EnableHooking = false;
+#endif
                 var keyCode = Marshal.ReadInt32(lParam);
                 KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, WM_KEYDOWN));
             }
