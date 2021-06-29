@@ -3,7 +3,7 @@ using KeyReceiverService.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Shared.Configuration;
+using Shared.Infrastructure;
 
 namespace KeyReceiverService
 {
@@ -27,12 +27,6 @@ namespace KeyReceiverService
                     services.AddTransient<KeyEventProcessor>();
                     services.AddHostedService<Worker>();
                 })
-                .ConfigureLogging((hostBuilderContext, logging) =>
-                {
-                    logging.AddFileLogger(options =>
-                    {
-                        hostBuilderContext.Configuration.GetSection("Logging").GetSection("FileLogger").GetSection("Options").Bind(options);
-                    });
-                });
+                .ConfigureFileLogging();
     }
 }

@@ -8,6 +8,8 @@ using Shared.Configuration;
 using System;
 using System.Windows.Forms;
 using KeyPusher.Menus;
+using Microsoft.Extensions.Logging;
+using Shared.Infrastructure;
 
 namespace KeyPusher
 {
@@ -41,12 +43,6 @@ namespace KeyPusher
                         .AddTransient<IMenuItemPresenter, EnableHookMenuItem>()
                         .AddTransient<IMenuItemPresenter, DisableHookMenuItem>();
                 })
-                .ConfigureLogging((hostBuilderContext, logging) =>
-                {
-                    logging.AddFileLogger(options =>
-                    {
-                        hostBuilderContext.Configuration.GetSection("Logging").GetSection("FileLogger").GetSection("Options").Bind(options);
-                    });
-                });
+                .ConfigureFileLogging();
     }
 }

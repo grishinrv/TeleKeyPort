@@ -1,9 +1,12 @@
 ﻿using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Shared.Configuration;
 
 namespace Shared.Infrastructure
 {
-    public class Utils
+    public static class Utils
     {
         public static string GetApplicationRootPath()
         {
@@ -12,6 +15,18 @@ namespace Shared.Infrastructure
             if (current.StartsWith("file:\\"))
                 current = current.Substring(6, current.Length - 6);
             return current;
+        }
+
+        public static IHostBuilder ConfigureFileLogging(this IHostBuilder builder)
+        {
+            return builder.ConfigureLogging((hostBuilderContext, logging) =>
+            {
+                logging.AddFileLogger(options =>
+                {
+                    hostBuilderContext.Configuration.GetSection("Logging").GetSection("FileLogger")
+                        .GetSection("Options").Bind(options);
+                });
+            });
         }
     }
 }
