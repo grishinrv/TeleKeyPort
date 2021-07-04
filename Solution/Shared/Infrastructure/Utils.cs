@@ -2,6 +2,7 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Shared.Configuration;
 
 namespace Shared.Infrastructure
@@ -21,6 +22,7 @@ namespace Shared.Infrastructure
         {
             return builder.ConfigureLogging((hostBuilderContext, logging) =>
             {
+                logging.ClearProviders();
                 logging.AddFileLogger(options =>
                 {
                     hostBuilderContext.Configuration.GetSection("Logging").GetSection("FileLogger")

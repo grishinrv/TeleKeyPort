@@ -9,8 +9,9 @@ namespace Shared.Configuration
     {
         public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, Action<FileLoggerProviderOptions> configure)
         {
-            builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>();
-            builder.Services.Configure(configure);
+            builder.Services
+                .AddSingleton<ILoggerProvider, FileLoggerProvider>()
+                .Configure(configure);
             return builder;
         }
     }
