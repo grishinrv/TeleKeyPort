@@ -11,6 +11,12 @@ namespace Shared.Configuration
         {
             builder.Services
                 .AddSingleton<ILoggerProvider, FileLoggerProvider>()
+                .AddScoped(typeof(ILogger), (s) =>
+                {
+                    var provider = (ILoggerProvider) s.GetService(typeof(ILoggerProvider));
+                    return provider.CreateLogger("FileLogger");
+                })
+                .AddScoped(typeof(ILogger<>), typeof(LoggerWrapper<>))
                 .Configure(configure);
             return builder;
         }
