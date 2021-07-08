@@ -43,9 +43,7 @@ namespace KeyPusher.Services
 #if DEBUG
             _logger.LogInformation("Key code: {0}, event code: {1}", eventArgs.Key, eventArgs.EventCode);
 #endif
-            var keyWithHotKey = _menu.Items
-                .FirstOrDefault(x => x.HotKeyCode != null && ((Keys)x.HotKeyCode) == eventArgs.Key);
-            keyWithHotKey?.ExecuteAction();
+            _menu.InvokeHotkey(eventArgs.Key);
         }
 
         public void Dispose()

@@ -10,7 +10,7 @@ namespace KeyPusher.Menus
     public class MenuPresenter : IDisposable
     {
         private readonly NotifyIcon _trayIcon;
-        public IReadOnlyList<IMenuItemPresenter> Items { get; private set; }
+        private IReadOnlyList<IMenuItemPresenter> _items;
         private readonly ContextMenuStrip _mainTrayMenu;
         public MenuPresenter(ContextMenuStrip mainTrayMenu)
         {
@@ -32,29 +32,35 @@ namespace KeyPusher.Menus
             icon.Dispose();
         }
 
+        public void Dispose()
+        {
+            _trayIcon.Visible = false;
+            _mainTrayMenu.ItemClicked -= OnTrayItemClicked;
+        }
+
         internal void SetMenuItems(IReadOnlyList<IMenuItemPresenter> menuItems)
         {
-            Items = menuItems;
-            foreach (var item in Items)
+            _items = menuItems;
+            foreach (var item in _items)
             {
                 item.CreateView();
             }
         }
 
-        private void OnTrayItemClicked(object sender, ToolStripItemClickedEventArgs e) => Items.First(x => x.ActionName == e.ClickedItem.Text).ExecuteAction();
+        private void OnTrayItemClicked(object sender, ToolStripItemClickedEventArgs e) => _items.First(x => x.ActionName == e.ClickedItem.Text).ExecuteAction();
 
         internal void OnStateChanged()
         {
-            foreach (var item in Items)
+            foreach (var item in _items)
             {
                 item.StateChanged();
             }
         }
 
-        public void Dispose()
+        public void InvokeHotkey(Keys key)
         {
-            _trayIcon.Visible = false;
-            _mainTrayMenu.ItemClicked -= OnTrayItemClicked;
+            _items.FirstOrDefault(x => x.HotKeyCode != null && ((Keys)x.HotKeyCode) == key)
+                ?.ExecuteAction();
         }
     }
 }
