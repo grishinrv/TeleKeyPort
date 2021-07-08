@@ -40,8 +40,7 @@ namespace KeyPusher
                         .AddSingleton<KeyPusherEngine>()
                         .AddTransient<TcpChannel>()
                         .AddTransient<IMenuItemPresenter, ExitMenuItem>()
-                        .AddTransient<IMenuItemPresenter, EnableHookMenuItem>()
-                        .AddTransient<IMenuItemPresenter, DisableHookMenuItem>();
+                        .AddTransient<IMenuItemPresenter, ActivateMenuItem>();
                 })
                 .ConfigureFileLogging();
     }

@@ -13,7 +13,6 @@ namespace KeyPusher.Models
             Key = key;
             EventCode = eventCode;
         }
-
         public Keys Key { get; }
         public int EventCode { get; }
     }

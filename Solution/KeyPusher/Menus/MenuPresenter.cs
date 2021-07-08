@@ -10,7 +10,7 @@ namespace KeyPusher.Menus
     public class MenuPresenter : IDisposable
     {
         private readonly NotifyIcon _trayIcon;
-        private IReadOnlyList<IMenuItemPresenter> _menuItems;
+        public IReadOnlyList<IMenuItemPresenter> Items { get; private set; }
         private readonly ContextMenuStrip _mainTrayMenu;
         public MenuPresenter(ContextMenuStrip mainTrayMenu)
         {
@@ -34,18 +34,18 @@ namespace KeyPusher.Menus
 
         internal void SetMenuItems(IReadOnlyList<IMenuItemPresenter> menuItems)
         {
-            _menuItems = menuItems;
-            foreach (var item in _menuItems)
+            Items = menuItems;
+            foreach (var item in Items)
             {
                 item.CreateView();
             }
         }
 
-        private void OnTrayItemClicked(object sender, ToolStripItemClickedEventArgs e) => _menuItems.First(x => x.ActionName == e.ClickedItem.Text).ExecuteAction();
+        private void OnTrayItemClicked(object sender, ToolStripItemClickedEventArgs e) => Items.First(x => x.ActionName == e.ClickedItem.Text).ExecuteAction();
 
         internal void OnStateChanged()
         {
-            foreach (var item in _menuItems)
+            foreach (var item in Items)
             {
                 item.StateChanged();
             }

@@ -1,5 +1,6 @@
 ﻿using KeyPusher.Menus;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 using KeyPusher.WinApi;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,7 @@ namespace KeyPusher.Services
                 {
                     _enabled = value;
                     _menu.OnStateChanged();
-                    _keysDetector.EnableHooking = _enabled;
+                    _keysDetector.InputBlocked = _enabled;
                 }
             }
         }
@@ -39,7 +40,11 @@ namespace KeyPusher.Services
 
         private void OnKeyEvent(object source, Models.KeyEventArgs eventArgs)
         {
+#if DEBUG
             _logger.LogInformation("Key code: {0}, event code: {1}", eventArgs.Key, eventArgs.EventCode);
+#endif
+            var keyWithHotKey = _menu.Items.FirstOrDefault(x => ((Keys) x.HotKeyCode) == eventArgs.Key);
+            keyWithHotKey?.ExecuteAction();
         }
 
         public void Dispose()

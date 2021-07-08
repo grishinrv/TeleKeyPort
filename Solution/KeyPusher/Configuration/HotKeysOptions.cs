@@ -2,7 +2,6 @@
 {
     public class HotKeysOptions
     {
-        public byte TurnHookOn { get; set; }
-        public byte TurnHookOff { get; set; }
+        public byte TurnHookOnOff { get; set; }
     }
 }

@@ -11,6 +11,8 @@ namespace KeyPusher.WinApi
         private const int WH_KEYBOARD_LL = 13; // enable hooking
         private const int WM_KEYDOWN = 0x0100;
         private const int WM_KEYUP = 0x0101;
+        private readonly IntPtr _keyDown = (IntPtr) WM_KEYDOWN;
+        private readonly IntPtr _keyUp = (IntPtr) WM_KEYUP;
         private LowLevelKeyboardProc _proc;
         private IntPtr _hookId = IntPtr.Zero;
         private readonly HotKeysOptions _hotKeysOptions;
@@ -19,6 +21,7 @@ namespace KeyPusher.WinApi
         {
             _hotKeysOptions = hotKeysOptions;
             _proc = HookCallback;
+            _hookId = SetHook(_proc);
         }
         public void Dispose()
         {
@@ -26,25 +29,19 @@ namespace KeyPusher.WinApi
             UnBlock();
         }
 
-        private bool _enableHooking;
-        public bool EnableHooking
+        private bool _inputBlocked;
+        public bool InputBlocked
         {
-            get => _enableHooking;
+            get => _inputBlocked;
             set
             {
-                if (_enableHooking != value)
+                if (_inputBlocked != value)
                 {
-                    _enableHooking = value;
-                    if (_enableHooking)
-                    {
-                        _hookId = SetHook(_proc);
+                    _inputBlocked = value;
+                    if (_inputBlocked)
                         Block();
-                    }
                     else
-                    {
-                        UnhookWindowsHookEx(_hookId);
                         UnBlock();
-                    }
                 }
             }
         }
@@ -65,13 +62,13 @@ namespace KeyPusher.WinApi
 
         private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
+            var keyCode = Marshal.ReadInt32(lParam);
+            if (nCode >= 0 )
             {
-// #if DEBUG
-//                 EnableHooking = false;
-// #endif
-                var keyCode = Marshal.ReadInt32(lParam);
-                KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, WM_KEYDOWN));
+                if (wParam == _keyDown)
+                    KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, WM_KEYDOWN));
+                else if(wParam == _keyUp)
+                    KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, WM_KEYUP));
             }
             return CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
