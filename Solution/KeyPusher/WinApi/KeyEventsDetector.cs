@@ -20,6 +20,11 @@ namespace KeyPusher.WinApi
             _hotKeysOptions = hotKeysOptions;
             _proc = HookCallback;
         }
+        public void Dispose()
+        {
+            UnhookWindowsHookEx(_hookId);
+            UnBlock();
+        }
 
         private bool _enableHooking;
         public bool EnableHooking
@@ -30,14 +35,22 @@ namespace KeyPusher.WinApi
                 if (_enableHooking != value)
                 {
                     _enableHooking = value;
-                    if(_enableHooking)
+                    if (_enableHooking)
+                    {
                         _hookId = SetHook(_proc);
+                        Block();
+                    }
                     else
+                    {
                         UnhookWindowsHookEx(_hookId);
+                        UnBlock();
+                    }
                 }
             }
         }
 
+        private bool Block() => BlockInput(true);
+        private bool UnBlock() => BlockInput(false);
         public event Action<object, Models.KeyEventArgs> KeyEventHappened;
 
         private static IntPtr SetHook(LowLevelKeyboardProc proc)
@@ -54,15 +67,16 @@ namespace KeyPusher.WinApi
         {
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
-#if DEBUG
-                EnableHooking = false;
-#endif
+// #if DEBUG
+//                 EnableHooking = false;
+// #endif
                 var keyCode = Marshal.ReadInt32(lParam);
                 KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, WM_KEYDOWN));
             }
             return CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
 
+        #region Unmanaged interop
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook,
             LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
@@ -77,7 +91,9 @@ namespace KeyPusher.WinApi
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
-
-        public void Dispose() => UnhookWindowsHookEx(_hookId);
+        
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool BlockInput(bool fBlockIt);
+        #endregion
     }
 }
