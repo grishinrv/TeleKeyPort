@@ -3,22 +3,23 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using KeyPusher.Configuration;
+using Microsoft.Extensions.Logging;
+using Shared.Infrastructure;
 
 namespace KeyPusher.WinApi
 {
     public class KeyEventsDetector : IDisposable
     {
-        private const int WH_KEYBOARD_LL = 13; // enable hooking
-        private const int WM_KEYDOWN = 0x0100;
-        private const int WM_KEYUP = 0x0101;
-        private readonly IntPtr _keyDown = (IntPtr) WM_KEYDOWN;
-        private readonly IntPtr _keyUp = (IntPtr) WM_KEYUP;
+        private readonly IntPtr _keyDown = (IntPtr) KeyCodes.WM_KEYDOWN;
+        private readonly IntPtr _keyUp = (IntPtr) KeyCodes.WM_KEYUP;
         private LowLevelKeyboardProc _proc;
         private IntPtr _hookId = IntPtr.Zero;
         private readonly HotKeysOptions _hotKeysOptions;
+        private readonly ILogger<KeyEventsDetector> _logger;
 
-        public KeyEventsDetector(HotKeysOptions hotKeysOptions)
+        public KeyEventsDetector(ILogger<KeyEventsDetector> logger, HotKeysOptions hotKeysOptions)
         {
+            _logger = logger;
             _hotKeysOptions = hotKeysOptions;
             _proc = HookCallback;
             _hookId = SetHook(_proc);
@@ -46,15 +47,27 @@ namespace KeyPusher.WinApi
             }
         }
 
-        private bool Block() => BlockInput(true);
-        private bool UnBlock() => BlockInput(false);
+        private bool Block()
+        {
+            var result = BlockInput(true);
+            _logger.LogInformation("Block input, success - {0}", result);
+            return result;
+        }
+
+        private bool UnBlock()
+        {
+            var result = BlockInput(false);
+            _logger.LogInformation("Unlock input, success - {0}", result);
+            return result;
+        }
+
         public event Action<object, Models.KeyEventArgs> KeyEventHappened;
 
         private static IntPtr SetHook(LowLevelKeyboardProc proc)
         {
             using var curProcess = Process.GetCurrentProcess();
             using var curModule = curProcess.MainModule;
-            return SetWindowsHookEx(WH_KEYBOARD_LL, proc,GetModuleHandle(curModule.ModuleName), 0);
+            return SetWindowsHookEx(KeyCodes.WH_KEYBOARD_LL, proc,GetModuleHandle(curModule.ModuleName), 0);
         }
 
         private delegate IntPtr LowLevelKeyboardProc(
@@ -66,9 +79,9 @@ namespace KeyPusher.WinApi
             if (nCode >= 0 )
             {
                 if (wParam == _keyDown)
-                    KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, WM_KEYDOWN));
+                    KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, KeyCodes.WM_KEYDOWN));
                 else if(wParam == _keyUp)
-                    KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, WM_KEYUP));
+                    KeyEventHappened?.Invoke(this, new Models.KeyEventArgs((Keys)keyCode, KeyCodes.WM_KEYUP));
             }
             return CallNextHookEx(_hookId, nCode, wParam, lParam);
         }

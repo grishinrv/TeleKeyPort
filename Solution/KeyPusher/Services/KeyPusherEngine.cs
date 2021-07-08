@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using KeyPusher.WinApi;
 using Microsoft.Extensions.Logging;
+using Shared.Infrastructure;
 
 namespace KeyPusher.Services
 {
@@ -41,9 +42,10 @@ namespace KeyPusher.Services
         private void OnKeyEvent(object source, Models.KeyEventArgs eventArgs)
         {
 #if DEBUG
-            _logger.LogInformation("Key code: {0}, event code: {1}", eventArgs.Key, eventArgs.EventCode);
+            _logger.LogDebug("Key code: {0}, event code: {1}", eventArgs.Key, eventArgs.EventCode);
 #endif
-            _menu.InvokeHotkey(eventArgs.Key);
+            if (eventArgs.EventCode == KeyCodes.WM_KEYDOWN)
+                _menu.InvokeHotkey(eventArgs.Key);
         }
 
         public void Dispose()
