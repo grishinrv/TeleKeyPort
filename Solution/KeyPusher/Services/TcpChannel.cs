@@ -12,8 +12,9 @@ namespace KeyPusher.Services
         private readonly TcpClient _tcp;
         private readonly ConnectionOptions _options;
         private readonly ILogger<TcpChannel> _logger;
-        public TcpChannel(ConnectionOptions options)
+        public TcpChannel(ConnectionOptions options, ILogger<TcpChannel> logger)
         {
+            _logger = logger;
             _options = options;
             _tcp = new TcpClient();
         }
@@ -37,7 +38,15 @@ namespace KeyPusher.Services
             if (!_tcp.Connected)
             {
                 _logger.LogInformation("Begin connection...");
-                await _tcp.ConnectAsync(IPAddress.Parse(_options.ReceiverIp), _options.ReceiverPort);
+                try
+                {
+                    await _tcp.ConnectAsync(IPAddress.Parse(_options.ReceiverIp), _options.ReceiverPort);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message, e);
+                    throw e;
+                }
                 _logger.LogInformation("Begin connection... Success");
             }
         }

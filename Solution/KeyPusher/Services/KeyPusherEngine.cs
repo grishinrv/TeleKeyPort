@@ -1,10 +1,13 @@
 ﻿using KeyPusher.Menus;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using KeyPusher.WinApi;
+using MessagePack;
 using Microsoft.Extensions.Logging;
 using Shared.Infrastructure;
+using Shared.Models;
 
 namespace KeyPusher.Services
 {
@@ -46,6 +49,13 @@ namespace KeyPusher.Services
 #endif
             if (eventArgs.EventCode == KeyCodes.WM_KEYDOWN)
                 _menu.InvokeHotkey(eventArgs.Key);
+
+            if (Enabled)
+            {
+                var dto = new KeyEventMessage {EventCode = (uint)eventArgs.EventCode, KeyCode = (byte)eventArgs.Key};
+                var bytes = MessagePack.MessagePackSerializer.Serialize(dto, MessagePackSerializerOptions.Standard);
+                Task.Run(async () => await _tcp.Send(bytes));
+            }
         }
 
         public void Dispose()
