@@ -2,13 +2,15 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Shared.Infrastructure
 {
     public class FileLogger : ILogger
     {
         protected readonly FileLoggerProvider _provider;
-
+        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         public FileLogger([NotNull] FileLoggerProvider provider)
         {
             _provider = provider;
@@ -22,21 +24,32 @@ namespace Shared.Infrastructure
         {
             if (!IsEnabled(logLevel))
                 return;
-            var logsFolderPath = Utils.GetApplicationRootPath() + _provider.Options.FolderPath + "\\";
-            var fullFilePath = logsFolderPath + _provider.Options.FilePath.Replace("{date}", DateTimeOffset.UtcNow.ToString("yyyyMMdd"));
-            var logRecord =
-                $"{"[" + DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss+00:00") + "]"} [{logLevel.ToString()}] {formatter(state, exception)} {(exception != null ? exception.StackTrace : "")}";
-
-            while (exception != null)
+            Task.Run(() =>
             {
-                logRecord += Environment.NewLine;
-                logRecord += exception.Message;
-                logRecord += exception.StackTrace;
-                exception = exception.InnerException;
-            }
+                try
+                {
+                    _lock.EnterWriteLock();
+                    var logsFolderPath = Utils.GetApplicationRootPath() + _provider.Options.FolderPath + "\\";
+                    var fullFilePath = logsFolderPath + _provider.Options.FilePath.Replace("{date}", DateTimeOffset.UtcNow.ToString("yyyyMMdd"));
+                    var logRecord =
+                        $"{"[" + DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss+00:00") + "]"} [{logLevel.ToString()}] {formatter(state, exception)} {(exception != null ? exception.StackTrace : "")}";
+
+                    while (exception != null)
+                    {
+                        logRecord += Environment.NewLine;
+                        logRecord += exception.Message;
+                        logRecord += exception.StackTrace;
+                        exception = exception.InnerException;
+                    }
             
-            using var streamWriter = new StreamWriter(fullFilePath, true);
-            streamWriter.WriteLine(logRecord);
+                    using var streamWriter = new StreamWriter(fullFilePath, true);
+                    streamWriter.WriteLine(logRecord);
+                }
+                finally
+                {
+                    _lock.ExitWriteLock();
+                }
+            });
         }
     }
 }
