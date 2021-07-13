@@ -29,6 +29,7 @@ namespace Shared.Infrastructure
 
             while (exception != null)
             {
+                logRecord += Environment.NewLine;
                 logRecord += exception.Message;
                 logRecord += exception.StackTrace;
                 exception = exception.InnerException;
