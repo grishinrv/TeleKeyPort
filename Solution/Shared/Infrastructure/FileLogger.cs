@@ -27,6 +27,13 @@ namespace Shared.Infrastructure
             var logRecord =
                 $"{"[" + DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss+00:00") + "]"} [{logLevel.ToString()}] {formatter(state, exception)} {(exception != null ? exception.StackTrace : "")}";
 
+            while (exception != null)
+            {
+                logRecord += exception.Message;
+                logRecord += exception.StackTrace;
+                exception = exception.InnerException;
+            }
+            
             using var streamWriter = new StreamWriter(fullFilePath, true);
             streamWriter.WriteLine(logRecord);
         }
