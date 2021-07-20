@@ -10,7 +10,7 @@ namespace Shared.Infrastructure
     public class FileLogger : ILogger
     {
         protected readonly FileLoggerProvider _provider;
-        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        private readonly object _lock = new object();
         public FileLogger([NotNull] FileLoggerProvider provider)
         {
             _provider = provider;
@@ -26,9 +26,8 @@ namespace Shared.Infrastructure
                 return;
             Task.Run(() =>
             {
-                try
+                lock (formatter)
                 {
-                    _lock.EnterWriteLock();
                     var logsFolderPath = Utils.GetApplicationRootPath() + _provider.Options.FolderPath + "\\";
                     var fullFilePath = logsFolderPath + _provider.Options.FilePath.Replace("{date}", DateTimeOffset.UtcNow.ToString("yyyyMMdd"));
                     var logRecord =
@@ -44,10 +43,6 @@ namespace Shared.Infrastructure
             
                     using var streamWriter = new StreamWriter(fullFilePath, true);
                     streamWriter.WriteLine(logRecord);
-                }
-                finally
-                {
-                    _lock.ExitWriteLock();
                 }
             });
         }
